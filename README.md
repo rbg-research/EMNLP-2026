@@ -85,17 +85,17 @@ The bar chart vividly illustrates an extreme data skew, characterized by a heavy
 
 **The Visualization:** Nyishi, Assamese, and Mizo dominate the top with 50,000 to 60,000 sentences. The drop-off is precipitous, terminating in a long tail where Category II languages like Karbi, Nagamese, and Kokborok struggle with barely 1,000 to 2,500 sentences.
 
-**The Interpretation:** If fed into a shared Multimodal, Multilingual, and Multitask (M3) architecture without intervention, the network will heavily bias its weight updates toward the structural patterns of the high-resource languages. The network will likely experience catastrophic forgetting of the Category II languages as training progresses.
+**The Interpretation:** If fed into a Multilingual architecture without intervention, the network will heavily bias its weight updates toward the structural patterns of the high-resource languages. The network will likely experience catastrophic forgetting of the Category II languages as training progresses.
 
 **Actionable Takeaway:** Temperature-scaled sampling during data loading is strictly required to artificially upsample the bottom five languages and stabilize the gradient updates.
 
 ![Lexical Diversity](figures/2_lexical_diversity_ttr.png)
 
-The Type-Token Ratio (TTR) chart is arguably the most critical for your subword modeling strategy. It exposes severe inconsistencies in how the target languages are written.
+The Type-Token Ratio (TTR) chart is arguably the most critical for subword modeling strategy. It exposes severe inconsistencies in how the target languages are written.
 
 **The Visualization:** Karbi and Nagamese shoot massively to the right, showing enormous lexical diversity. Conversely, Khasi barely registers a visible bar on the far left.
 
-**The Interpretation:** The high TTR for transliterated languages (Karbi, Nagamese) strongly implies high orthographic noise—meaning translators are spelling the same phonetics in wildly different ways using the Latin script. Standard tokenization will shatter these noisy words into meaningless fragments. Meanwhile, the practically invisible bar for Khasi (0.008 TTR) visually confirms a fatal flaw in that specific corpus: it is almost certainly choked with duplicated rows or highly rigid, repetitive boilerplate templates.
+**The Interpretation:** The high TTR for transliterated languages (Karbi, Nagamese) strongly implies high orthographic noise-meaning translators are spelling the same phonetics in wildly different ways using the Latin script. Standard tokenization will shatter these noisy words into meaningless fragments. Meanwhile, the practically invisible bar for Khasi (0.008 TTR) visually confirms a fatal flaw in that specific corpus: it is almost certainly choked with duplicated rows or highly rigid, repetitive boilerplate templates.
 
 **Actionable Takeaway:** Khasi requires immediate, aggressive deduplication. For Karbi and Nagamese, subword regularization (like BPE-dropout) will be necessary to force the encoder to learn robust representations despite the spelling variations.
 
@@ -103,7 +103,7 @@ The Type-Token Ratio (TTR) chart is arguably the most critical for your subword 
 
 The scatter plot visualizes the density and spread of sequence lengths, which directly impacts computational efficiency.
 
-**The Visualization:** While there is a dense, correlated cluster under 30 words, there is a massive, sparse cloud of points extending all the way to 100 words. Furthermore, you can see distinct color groupings pushing either above or below the red dashed trendline.
+**The Visualization:** While there is a dense, correlated cluster under 30 words, there is a massive, sparse cloud of points extending all the way to 100 words. Furthermore, we can see distinct color groupings pushing either above or below the red dashed trendline.
 
 **The Interpretation:** For models destined for deployment on mobile or edge devices, memory footprint during inference is paramount. If a batch contains even one of those 90-word outlier sentences, all the 5-word Nyishi sentences in that same batch must be padded with dozens of empty tokens, wasting vast amounts of compute and memory.
 
@@ -117,7 +117,7 @@ The boxplots directly expose the "Orthographic Divide" we discussed, visually se
 
 **The Interpretation:** Native Indic scripts pack complex syllables efficiently, requiring fewer total words than English. Transliterated Latin scripts require more distinct characters and word breaks to convey the same meaning. Furthermore, the massive right-reaching whiskers (like Nagamese extending past 3.4) show severe structural outliers.
 
-**Actionable Takeaway:** A statically defined generation limit will inherently bias the model. If you tune the output length for Assamese, the model will prematurely truncate transliterated languages, violating neutrality. The shared decoder must rely on language-conditioned, dynamic length penalties.
+**Actionable Takeaway:** A statically defined generation limit will inherently bias the model. If we tune the output length for Assamese, the model will prematurely truncate transliterated languages, violating neutrality. The decoder must rely on language-conditioned, dynamic length penalties.
 
 # Installation
 ```commandline
